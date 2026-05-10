@@ -3,16 +3,17 @@ OceanX AI Underwriting Pipeline — FastAPI application.
 
 Phase 0 endpoints: /health, /test-claude, /prospects
 Phase 1 endpoint:  /run-pipeline  (SSE streaming)
+Phase 3 endpoint:  /download-contract
 """
 
 import os
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 load_dotenv()
 
-app = FastAPI(title="OceanX AI Underwriting Pipeline", version="0.2.0")
+app = FastAPI(title="OceanX AI Underwriting Pipeline", version="0.3.0")
 
 
 @app.get("/health")
@@ -86,4 +87,36 @@ async def run_pipeline_endpoint(prospect_id: str = "atlantic"):
             "Connection": "keep-alive",
             "X-Accel-Buffering": "no",   # disable nginx buffering if behind a proxy
         },
+    )
+
+
+@app.get("/download-contract")
+async def download_contract(filename: str):
+    """
+    Serves a generated .docx contract for download.
+
+    The filename param must match an existing file in the contracts/ folder.
+    Security: rejects any path traversal — only the basename is used.
+    """
+    # Strip to basename only — prevent path traversal
+    safe_name = os.path.basename(filename)
+    if safe_name != filename or ".." in filename:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Invalid filename — path traversal not allowed"},
+        )
+
+    contracts_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "contracts")
+    filepath = os.path.join(contracts_dir, safe_name)
+
+    if not os.path.isfile(filepath):
+        return JSONResponse(
+            status_code=404,
+            content={"error": f"Contract not found: {safe_name}"},
+        )
+
+    return FileResponse(
+        path=filepath,
+        media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        filename=safe_name,
     )

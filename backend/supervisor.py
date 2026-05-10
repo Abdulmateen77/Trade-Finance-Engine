@@ -3,7 +3,7 @@ Supervisor — orchestrates agents in sequence and writes every event to audit.j
 
 Phase 1: intake only.
 Phase 2: intake → underwriting.
-Phase 3: intake → underwriting → contract (not yet built).
+Phase 3: intake → underwriting → contract.
 
 Confidence routing for intake output:
   >= 0.70  → continue to underwriting
@@ -12,14 +12,18 @@ Confidence routing for intake output:
 
 Underwriting routing:
   decision == REJECT          → halt (no contract needed)
+  decision == REQUEST_INFO    → halt (need more info before contract)
   requires_human_review       → flag, continue
+  confidence < 0.70           → flag, continue
+
+Contract routing:
   confidence < 0.70           → flag, continue
 """
 
 from datetime import datetime, timezone
 from typing import AsyncGenerator
 
-from agents import run_intake_agent, run_underwriting_agent
+from agents import run_contract_agent, run_intake_agent, run_underwriting_agent
 from audit import write_event
 from models import AgentEvent
 
@@ -208,13 +212,82 @@ async def run_pipeline(deal_package: dict) -> AsyncGenerator[AgentEvent, None]:
             _log(sup)
             yield sup
 
-    # ── Pipeline complete (Phase 2) ───────────────────────────────────────────
-    # Phase 3 will insert the contract stage before this block.
+    # ── Stage 3: Contract ────────────────────────────────────────────────────
+    # Only runs for APPROVE or APPROVE_WITH_CONDITIONS.
+    # REJECT already halted above; REQUEST_INFO halts here.
+    if not underwriting_output:
+        return
+
+    decision = underwriting_output.get("decision", "")
+
+    if decision == "REQUEST_INFO":
+        sup = AgentEvent(
+            agent="supervisor",
+            event_type="flag",
+            payload={
+                "action": "halt",
+                "reason": "underwriting requested more info before contract",
+            },
+            timestamp=now_iso(),
+        )
+        write_event(sup)
+        _log(sup)
+        yield sup
+        return
+
+    # Extract inputs for contract agent
+    order_summary = intake_output.get("order_summary", {})
+    company_info = {
+        "name": deal_package.get("company", {}).get("name", ""),
+        "country": deal_package.get("company", {}).get("country", ""),
+        "type": deal_package.get("company", {}).get("type", ""),
+    }
+
+    contract_output = None
+
+    async for event in run_contract_agent(underwriting_output, order_summary, company_info):
+        write_event(event)
+        _log(event)
+        yield event
+
+        if event.event_type == "output" and event.agent == "contract":
+            contract_output = event.payload.get("contract_output")
+
+        if event.event_type == "error":
+            sup = AgentEvent(
+                agent="supervisor",
+                event_type="flag",
+                payload={"action": "halt", "reason": "contract error"},
+                timestamp=now_iso(),
+            )
+            write_event(sup)
+            _log(sup)
+            yield sup
+            return
+
+    # ── Supervisor routing (contract) ─────────────────────────────────────────
+    if contract_output:
+        confidence = contract_output.get("confidence", 0.0)
+        if confidence < 0.7:
+            sup = AgentEvent(
+                agent="supervisor",
+                event_type="flag",
+                payload={
+                    "action": "continue_with_review",
+                    "reason": f"contract confidence below 0.70 ({confidence:.2f})",
+                },
+                timestamp=now_iso(),
+            )
+            write_event(sup)
+            _log(sup)
+            yield sup
+
+    # ── Pipeline complete (Phase 3) ───────────────────────────────────────────
     decision_label = underwriting_output.get("decision", "unknown") if underwriting_output else "unknown"
     done = AgentEvent(
         agent="supervisor",
         event_type="status",
-        payload={"state": "pipeline_complete", "phase": 2, "decision": decision_label},
+        payload={"state": "pipeline_complete", "phase": 3, "decision": decision_label},
         timestamp=now_iso(),
     )
     write_event(done)

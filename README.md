@@ -43,23 +43,34 @@ Expected responses:
 
 ---
 
-## Pipeline testing (Phase 2: intake + underwriting)
+## Pipeline testing (Phase 3: intake + underwriting + contract)
 
 ```powershell
-# Atlantic Components Ltd — expected: APPROVE_WITH_CONDITIONS (~60–120s)
+# Atlantic Components Ltd — expected: APPROVE_WITH_CONDITIONS + contract (~90–180s)
 # Red flag: £52k directors loan caught by underwriting
-# Liquidity flag: min balance < 25% of ADB
+# Contract generated with conditions attached
 curl.exe -N http://localhost:8000/run-pipeline
 
-# Nordic Apparel Co. — expected: APPROVE, clean case (~60–120s)
+# Nordic Apparel Co. — expected: APPROVE + contract (~90–180s)
+# Clean case, full contract generated
 curl.exe -N "http://localhost:8000/run-pipeline?prospect_id=nordic"
 
-# Sunrise Trading Ltd — expected: REJECT (~30–60s)
+# Sunrise Trading Ltd — expected: REJECT, no contract (~30–60s)
 # Fails: tenure < 2 years, revenue < $1M USD, gross margin < 30%
+# Pipeline halts after underwriting — no contract agent runs
 curl.exe -N "http://localhost:8000/run-pipeline?prospect_id=sunrise"
 ```
 
-Each command streams `AgentEvent` JSON objects as Server-Sent Events until the supervisor emits `pipeline_complete`. The server logs a one-line summary of every event to stdout. Underwriting runs after intake completes — expect the full pipeline to take 60–120 seconds per prospect.
+Each command streams `AgentEvent` JSON objects as Server-Sent Events until the supervisor emits `pipeline_complete`. The contract agent only runs for APPROVE and APPROVE_WITH_CONDITIONS decisions.
+
+### Download generated contract
+
+After a successful pipeline run (APPROVE or APPROVE_WITH_CONDITIONS), download the .docx:
+
+```powershell
+# Replace filename with the actual filename from the contract_output event
+curl.exe -o downloaded.docx "http://localhost:8000/download-contract?filename=OCX-atlantic-components-ltd-2026-05-11.docx"
+```
 
 ---
 
@@ -70,6 +81,6 @@ Each command streams `AgentEvent` JSON objects as Server-Sent Events until the s
 | 0 | ✅ Done | Foundation: structure, schemas, mock data, SDK smoke test |
 | 1 | ✅ Done | Intake agent + supervisor + SSE streaming |
 | 2 | ✅ Done | Underwriting agent |
-| 3 | ⏳ Next | Contract agent |
+| 3 | ✅ Done | Contract agent + .docx generation |
 | 4 | — | Polish: red flag verification, latency tracking, error paths |
 | 5 | — | Frontend (separate brief) |
