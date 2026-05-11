@@ -23,6 +23,7 @@ interface AgentDetailDialogProps {
   agent: AgentSlug | null
   state: AgentState | null
   prospectId: string
+  defaultTab?: "output" | "checklist"
 }
 
 const agentMeta: Record<AgentSlug, { title: string; subtitle: string; step: number }> = {
@@ -39,7 +40,7 @@ function getSummaryText(agent: AgentSlug, output: Record<string, unknown> | null
   return ""
 }
 
-export function AgentDetailDialog({ open, onOpenChange, agent, state, prospectId }: AgentDetailDialogProps) {
+export function AgentDetailDialog({ open, onOpenChange, agent, state, prospectId, defaultTab: propDefaultTab }: AgentDetailDialogProps) {
   if (!agent || !state) return null
 
   const meta = agentMeta[agent]
@@ -47,7 +48,8 @@ export function AgentDetailDialog({ open, onOpenChange, agent, state, prospectId
   const hasError = state.status === "error"
   const showOutputTab = hasOutput || state.status === "skipped"
 
-  const defaultTab = hasError ? "error" : hasOutput ? "output" : "checklist"
+  const computedDefault = hasError ? "error" : hasOutput || state.status === "skipped" ? "output" : "checklist"
+  const defaultTab = propDefaultTab && (propDefaultTab === "output" && showOutputTab) ? "output" : propDefaultTab === "checklist" ? "checklist" : computedDefault
   const summaryText = hasOutput ? getSummaryText(agent, state.output) : ""
 
   return (

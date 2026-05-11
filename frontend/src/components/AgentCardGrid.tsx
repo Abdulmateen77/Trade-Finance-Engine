@@ -9,8 +9,10 @@ interface AgentCardGridProps {
   prospectId: string
 }
 
+type OpenAgent = { agent: AgentSlug; defaultTab: "output" | "checklist" } | null
+
 export function AgentCardGrid({ events, prospectId }: AgentCardGridProps) {
-  const [openAgent, setOpenAgent] = useState<AgentSlug | null>(null)
+  const [openAgent, setOpenAgent] = useState<OpenAgent>(null)
   const states = deriveAgentStates(events)
 
   return (
@@ -20,28 +22,29 @@ export function AgentCardGrid({ events, prospectId }: AgentCardGridProps) {
           agent="intake"
           state={states.intake}
           stepNumber={2}
-          onOpen={(a) => setOpenAgent(a)}
+          onOpen={(agent, tab) => setOpenAgent({ agent, defaultTab: tab })}
         />
         <AgentCard
           agent="underwriting"
           state={states.underwriting}
           stepNumber={3}
-          onOpen={(a) => setOpenAgent(a)}
+          onOpen={(agent, tab) => setOpenAgent({ agent, defaultTab: tab })}
         />
         <AgentCard
           agent="contract"
           state={states.contract}
           stepNumber={4}
-          onOpen={(a) => setOpenAgent(a)}
+          onOpen={(agent, tab) => setOpenAgent({ agent, defaultTab: tab })}
         />
       </div>
 
       <AgentDetailDialog
         open={openAgent !== null}
         onOpenChange={(o) => { if (!o) setOpenAgent(null) }}
-        agent={openAgent}
-        state={openAgent ? states[openAgent] : null}
+        agent={openAgent?.agent ?? null}
+        state={openAgent ? states[openAgent.agent] : null}
         prospectId={prospectId}
+        defaultTab={openAgent?.defaultTab ?? "checklist"}
       />
     </>
   )
