@@ -27,7 +27,7 @@ jobs:
 
   frontend-build:
     docker:
-      - image: cimg/node:20.11
+      - image: cimg/node:22.12
     working_directory: ~/project/frontend
     steps:
       - checkout:
