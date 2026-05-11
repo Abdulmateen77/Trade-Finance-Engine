@@ -57,21 +57,25 @@ export function AppHeader({ prospectId, setProspectId, pipeline }: AppHeaderProp
         </div>
 
         {/* Right: controls */}
-        <div className="flex items-center gap-3">
-          <Select value={prospectId} onValueChange={setProspectId} disabled={isStreaming}>
-            <SelectTrigger className="w-[200px] h-9 text-sm">
-              <SelectValue placeholder="Select prospect" />
-            </SelectTrigger>
-            <SelectContent>
-              {PROSPECTS.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-4">
+          {/* Select with label */}
+          <div>
+            <p className="text-xs uppercase tracking-wide font-semibold text-slate-500 mb-1.5">Select Company</p>
+            <Select value={prospectId} onValueChange={setProspectId} disabled={isStreaming}>
+              <SelectTrigger className="w-[200px] h-9 text-sm">
+                <SelectValue placeholder="Select prospect" />
+              </SelectTrigger>
+              <SelectContent>
+                {PROSPECTS.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 pt-5">
             <Switch disabled id="step-through" />
             <label
               htmlFor="step-through"
@@ -81,33 +85,42 @@ export function AppHeader({ prospectId, setProspectId, pipeline }: AppHeaderProp
             </label>
           </div>
 
-          <Button
-            size="sm"
-            onClick={() => run(prospectId)}
-            disabled={isStreaming}
-          >
-            {isStreaming ? (
-              <>
-                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                Running…
-              </>
-            ) : (
-              <>
-                <Play className="mr-1.5 h-3.5 w-3.5" />
-                Run Pipeline
-              </>
-            )}
-          </Button>
+          {/* Run Pipeline — prominent */}
+          <div className="pt-5">
+            <button
+              onClick={() => run(prospectId)}
+              disabled={isStreaming}
+              className={`inline-flex items-center justify-center rounded-lg px-6 py-2.5 text-sm font-semibold text-white transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                isStreaming
+                  ? "bg-slate-700 opacity-70 cursor-not-allowed"
+                  : "bg-gradient-to-r from-slate-900 to-slate-700 hover:from-slate-800 hover:to-slate-600 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+              }`}
+            >
+              {isStreaming ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Running pipeline...
+                </>
+              ) : (
+                <>
+                  <Play className="mr-2 h-4 w-4" />
+                  Run Pipeline
+                </>
+              )}
+            </button>
+          </div>
 
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={reset}
-            disabled={isStreaming || !hasEvents}
-          >
-            <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-            Reset
-          </Button>
+          <div className="pt-5">
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={reset}
+              disabled={isStreaming || !hasEvents}
+            >
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
+              Reset
+            </Button>
+          </div>
         </div>
       </div>
 

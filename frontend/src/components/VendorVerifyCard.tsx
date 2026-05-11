@@ -83,7 +83,7 @@ export function VendorVerifyCard({ prospect }: VendorVerifyCardProps) {
       <Collapsible open={sourcesExpanded} onOpenChange={setSourcesExpanded}>
         {/* Collapsed summary row — always visible */}
         <div
-          className="flex items-center justify-between cursor-pointer select-none py-1"
+          className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 p-3 px-4 cursor-pointer select-none hover:bg-slate-100 hover:border-slate-300 transition-colors duration-150"
           onClick={() => setSourcesExpanded(!sourcesExpanded)}
           onKeyDown={(e) => {
             if (e.key === "Enter" || e.key === " ") {
@@ -114,8 +114,11 @@ export function VendorVerifyCard({ prospect }: VendorVerifyCardProps) {
               <Check className="h-2.5 w-2.5" aria-hidden="true" />
               Ready
             </span>
+            <span className="text-xs text-slate-500">
+              {sourcesExpanded ? "Hide" : "Show details"}
+            </span>
             <ChevronDown
-              className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${sourcesExpanded ? "rotate-180" : ""}`}
+              className={`h-5 w-5 text-slate-400 transition-transform duration-200 ${sourcesExpanded ? "rotate-180" : ""}`}
             />
           </div>
         </div>

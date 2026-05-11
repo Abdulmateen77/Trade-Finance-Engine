@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { AlertTriangle, ArrowUpRight } from "lucide-react"
 import { StatusBadge } from "@/components/StatusBadge"
 import type { AgentSlug, AgentState } from "@/lib/deriveAgentState"
 import { getCuratedStatus } from "@/lib/agentStatusMessages"
@@ -82,6 +83,40 @@ export function AgentCard({ agent, state, stepNumber, onOpen }: AgentCardProps) 
             )}
           </div>
         )}
+
+      {/* View output button */}
+      <ViewOutputButton status={state.status} onOpen={() => onOpen(agent)} />
+    </div>
+  )
+}
+
+function ViewOutputButton({ status, onOpen }: { status: AgentState["status"]; onOpen: () => void }) {
+  if (status === "idle" || status === "running") return null
+
+  let label = "View output"
+  let style = "text-slate-600 hover:bg-slate-50"
+
+  if (status === "flagged") {
+    label = "View output"
+    style = "text-amber-700 hover:bg-amber-50"
+  } else if (status === "error") {
+    label = "View error"
+    style = "text-red-600 hover:bg-red-50"
+  } else if (status === "skipped") {
+    label = "Skipped — view checklist"
+    style = "text-slate-400 hover:bg-slate-50"
+  }
+
+  return (
+    <div className="mt-3 pt-3 border-t border-slate-100">
+      <button
+        onClick={(e) => { e.stopPropagation(); onOpen() }}
+        className={`inline-flex items-center text-xs font-medium transition-colors duration-150 rounded-md px-2 py-1 ${style}`}
+      >
+        {label}
+        {status === "flagged" && <AlertTriangle className="ml-1.5 h-3 w-3" aria-hidden="true" />}
+        {status !== "flagged" && <ArrowUpRight className="ml-1.5 h-3.5 w-3.5" aria-hidden="true" />}
+      </button>
     </div>
   )
 }
