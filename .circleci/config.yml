@@ -1,0 +1,56 @@
+version: 2.1
+
+jobs:
+  backend-check:
+    docker:
+      - image: cimg/python:3.11
+    working_directory: ~/project/backend
+    steps:
+      - checkout:
+          path: ~/project
+      - restore_cache:
+          keys:
+            - pip-v1-{{ checksum "requirements.txt" }}
+      - run:
+          name: Install dependencies
+          command: pip install -r requirements.txt
+      - save_cache:
+          key: pip-v1-{{ checksum "requirements.txt" }}
+          paths:
+            - ~/.local/lib/python3.11/site-packages
+      - run:
+          name: Syntax check all Python files
+          command: python -m py_compile main.py agents.py supervisor.py models.py audit.py prompts.py mock_data.py contract_writer.py
+      - run:
+          name: Import validation
+          command: python -c "from main import app; print('FastAPI app OK')"
+
+  frontend-build:
+    docker:
+      - image: cimg/node:20.11
+    working_directory: ~/project/frontend
+    steps:
+      - checkout:
+          path: ~/project
+      - restore_cache:
+          keys:
+            - npm-v1-{{ checksum "package-lock.json" }}
+      - run:
+          name: Install dependencies
+          command: npm ci
+      - save_cache:
+          key: npm-v1-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
+      - run:
+          name: TypeScript compile + Vite build
+          command: npm run build
+      - store_artifacts:
+          path: dist
+          destination: frontend-build
+
+workflows:
+  build-and-check:
+    jobs:
+      - backend-check
+      - frontend-build
