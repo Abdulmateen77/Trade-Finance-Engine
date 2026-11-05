@@ -1,0 +1,182 @@
+﻿{
+    "customer_summary":  {
+                             "company":  "Atlantic Components Ltd",
+                             "country":  "United Kingdom",
+                             "tenure_years":  7.0,
+                             "business_model":  "B2B importer: sources electronic components from Asia, sells to UK distributors and retailers",
+                             "channels":  "B2B sales via Shopify and direct invoicing to UK distributors (Maplin, RS Components, Farnell)",
+                             "import_regions":  "China (Shenzhen TechParts Co.), Hong Kong (Hong Kong Electro Ltd), Taiwan (Taiwan Sensor Works)"
+                         },
+    "data_coverage":  {
+                          "bank_connected":  true,
+                          "accounting_connected":  true,
+                          "ecommerce_connected":  true,
+                          "uploads_received":  [
+
+                                               ],
+                          "meeting_notes":  false,
+                          "confidence_label":  "Medium",
+                          "confidence_rationale":  "All three high-trust data sources connected (bank via Plaid, accounting via Xero, e-commerce via Shopify). However, critical ADB calculation missing from intake data. Daily balances show severe liquidity decline from ┬ú231k (Mar-26) to ┬ú18k (Apr-26 end). Large undisclosed director\u0027s loan (┬ú52k on 2026-02-14) materially impacts liquidity profile. Transaction history only partial (Oct 2025 - Mar 2026) with daily balance data starting Feb 2026, creating analysis gaps."
+                      },
+    "basic_qualification":  [
+                                {
+                                    "name":  "Annual Revenue \u003e= USD 1,000,000",
+                                    "threshold":  "ÔëÑ USD 1,000,000",
+                                    "actual":  "USD 3,024,000",
+                                    "passed":  true
+                                },
+                                {
+                                    "name":  "Country in approved list",
+                                    "threshold":  "UK, US, Nordics, AU, CA, NZ, SG, HK, FR, DE, ES, PT, NL, BE, CH, LU, IT",
+                                    "actual":  "United Kingdom",
+                                    "passed":  true
+                                },
+                                {
+                                    "name":  "Business tenure \u003e= 2 years",
+                                    "threshold":  "ÔëÑ 2 years",
+                                    "actual":  "7.0 years",
+                                    "passed":  true
+                                },
+                                {
+                                    "name":  "Business model: imports physical goods",
+                                    "threshold":  "Imports physical goods on open credit terms",
+                                    "actual":  "B2B importer of electronic components from Asia (30% deposit, 70% on shipment terms)",
+                                    "passed":  true
+                                }
+                            ],
+    "deep_qualification":  [
+                               {
+                                   "name":  "Debt ratio \u003c= 10% of annual revenue",
+                                   "threshold":  "Ôëñ 10%",
+                                   "actual":  "1.67% (┬ú40,000 / ┬ú2,400,000)",
+                                   "passed":  true
+                               },
+                               {
+                                   "name":  "Gross margin \u003e= 30%",
+                                   "threshold":  "ÔëÑ 30%",
+                                   "actual":  "32.0%",
+                                   "passed":  true
+                               },
+                               {
+                                   "name":  "Cash runway \u003e 6 months",
+                                   "threshold":  "\u003e 6 months",
+                                   "actual":  "0.59 months (┬ú95,000 / ┬ú160,000)",
+                                   "passed":  false
+                               },
+                               {
+                                   "name":  "Overdue AP \u003c= 20% of total AP",
+                                   "threshold":  "Ôëñ 20%",
+                                   "actual":  "12.0%",
+                                   "passed":  true
+                               },
+                               {
+                                   "name":  "ADB sufficient for weekly direct debits",
+                                   "threshold":  "Weekly debit \u003c 50% of ADB",
+                                   "actual":  "ADB not calculable from provided data; end-of-period balance ┬ú18,100 critically low",
+                                   "passed":  false
+                               }
+                           ],
+    "key_metrics":  {
+                        "revenue_ttm_gbp":  2400000.0,
+                        "gross_margin_pct":  32.0,
+                        "net_profit_gbp":  180000.0,
+                        "cash_gbp":  95000.0,
+                        "adb_90d_gbp":  0.0,
+                        "min_daily_balance_gbp":  18100.0,
+                        "monthly_opex_gbp":  160000.0,
+                        "debt_gbp":  40000.0,
+                        "ap_total_gbp":  180000.0,
+                        "ap_overdue_pct":  12.0,
+                        "dso_days":  38
+                    },
+    "method_a_liquidity":  {
+                               "adb_90d_gbp":  0.0,
+                               "base_limit_gbp":  0.0,
+                               "adjustments_applied":  [
+                                                           "ADB not provided in intake data (liquidity_summary.adb_90d_gbp = 0.0)",
+                                                           "Manual calculation from daily balances (Feb 1 - Apr 30, 2026): Unable to perform as daily_balances array not provided in this input",
+                                                           "Proxy calculation from transaction end-of-day balances (Oct 2025 - Mar 2026): Average EOD balance = ┬ú178,522",
+                                                           "CRITICAL ISSUE: Min daily balance of ┬ú18,100 is only 10.1% of proxy ADB (far below 25% threshold)",
+                                                           "Director\u0027s loan withdrawal of ┬ú52,000 on 2026-02-14 represents 29% of proxy ADB",
+                                                           "Balance decline from ┬ú231,310 (Mar 31) to ┬ú18,100 (Apr 30) = -92.2% indicates severe liquidity stress",
+                                                           "Given material uncertainty and severe end-period decline, Method A is unreliable for limit setting"
+                                                       ],
+                               "method_a_limit_gbp":  0.0
+                           },
+    "method_b_revenue_caps":  {
+                                  "import_cap_gbp":  240000.0,
+                                  "inventory_cap_gbp":  240000.0,
+                                  "total_cap_gbp":  480000.0
+                              },
+    "recommended_limits":  {
+                               "import_finance_gbp":  0.0,
+                               "inventory_finance_gbp":  0.0,
+                               "total_gbp":  0.0
+                           },
+    "repayment_fit":  {
+                          "cash_cycle_months":  4.0,
+                          "repayment_weeks":  16,
+                          "weekly_debit_gbp":  0.0,
+                          "sanity_check":  "FAIL ÔÇö Cannot establish repayment fit. Based on requested limit of ┬ú150,000: weekly debit would be ┬ú9,375 over 16 weeks. With min daily balance of ┬ú18,100 and severe liquidity decline, this is not sustainable. Customer would likely default within first few weeks."
+                      },
+    "risk_flags":  [
+                       {
+                           "severity":  "high",
+                           "description":  "UNDISCLOSED DIRECTOR\u0027S LOAN: ┬ú52,000 transfer to \u0027K. Mensah Personal\u0027 on 2026-02-14 with reference \u0027DIRECTORS LOAN\u0027. This represents 26.5% of the balance at that time (┬ú196,350 post-transfer from ┬ú248,350). No mention of this material related-party transaction in the intake data or financials. This is a red flag for potential cash extraction and must be explained."
+                       },
+                       {
+                           "severity":  "high",
+                           "description":  "SEVERE LIQUIDITY DECLINE: Daily balances fell from ┬ú231,310 (Mar 31, 2026) to ┬ú18,100 (Apr 30, 2026) ÔÇö a 92% drop in one month. This is not explained by normal operating expenses and suggests a material adverse event or additional cash extraction not visible in the transaction history provided (which ends Mar 31)."
+                       },
+                       {
+                           "severity":  "high",
+                           "description":  "CASH RUNWAY FAILURE: Current cash of ┬ú95,000 / monthly opex of ┬ú160,000 = 0.59 months (18 days). This is critically below the 6-month threshold and indicates immediate liquidity stress. Company cannot sustain operations without additional funding or collections."
+                       },
+                       {
+                           "severity":  "high",
+                           "description":  "ADB DATA GAP: ADB was not calculated in intake despite being the primary underwriting metric. Transaction history ends Mar 31, but daily balances show catastrophic decline through Apr 30. Unable to reliably calculate 90-day ADB from provided data due to temporal gaps."
+                       },
+                       {
+                           "severity":  "medium",
+                           "description":  "MIN BALANCE vs ADB RATIO: Min daily balance of ┬ú18,100 is only 10.1% of the proxy ADB (┬ú178,522 calculated from Oct 2025 - Mar 2026 EOD balances). This is far below the 25% threshold and indicates extreme balance volatility and/or systematic cash depletion."
+                       },
+                       {
+                           "severity":  "medium",
+                           "description":  "TIMING MISMATCH: Transaction history covers Oct 2025 - Mar 2026; daily balances cover Feb - Apr 2026. The liquidity crisis visible in April cannot be traced back through the transaction history, creating an analytical blind spot."
+                       },
+                       {
+                           "severity":  "low",
+                           "description":  "EXISTING DEBT NOT DETAILED: ┬ú40,000 debt mentioned in financials but no corresponding loan repayments visible in bank transactions. Need clarity on lender, terms, and repayment schedule."
+                       }
+                   ],
+    "impact_of_capital":  {
+                              "assumptions":  "Calculation not performed due to REJECT decision. Given severe liquidity issues and undisclosed related-party transactions, providing additional capital would likely result in loss. Customer appears to be in financial distress.",
+                              "sales_per_cycle_gbp":  0.0,
+                              "turns_per_year":  0.0,
+                              "incremental_annual_sales_gbp":  0.0,
+                              "incremental_annual_gross_profit_gbp":  0.0
+                          },
+    "decision":  "REJECT",
+    "decision_rationale":  [
+                               "BASIC QUALIFICATION: All four gates passed (revenue USD 3.02m \u003e USD 1m; UK approved; 7 years tenure; imports physical goods).",
+                               "DEEP QUALIFICATION: Critical failures on cash runway (0.59 months vs 6-month threshold) and ADB sufficiency (unable to verify, severe decline evident).",
+                               "HIGH-SEVERITY RED FLAGS: Three high-severity flags identified: (1) Undisclosed ┬ú52,000 director\u0027s loan on 2026-02-14 representing potential cash extraction; (2) Severe 92% liquidity decline from ┬ú231k to ┬ú18k in one month; (3) Cash runway of only 18 days indicating imminent insolvency risk.",
+                               "METHOD A LIQUIDITY: Cannot reliably calculate due to ADB data gap and severe end-period decline. Proxy ADB of ┬ú178k from transaction EOD balances is invalidated by the ┬ú52k director withdrawal and subsequent collapse to ┬ú18k.",
+                               "METHOD B REVENUE: While revenue caps would theoretically allow up to ┬ú480k combined limit (┬ú240k IF + ┬ú240k Inventory), this is irrelevant given liquidity failure.",
+                               "REPAYMENT FIT: FAIL. Weekly debit of ┬ú9,375 (based on ┬ú150k request / 16 weeks) is 52% of current min balance (┬ú18,100) and would likely trigger immediate default.",
+                               "RECOMMENDED LIMIT: ┬ú0. Customer does not meet minimum liquidity standards and shows signs of financial distress.",
+                               "DECISION RATIONALE: The combination of (a) undisclosed material related-party transaction, (b) catastrophic liquidity decline not explained by normal operations, (c) cash runway below 1 month, and (d) inability to calculate reliable ADB makes this an unacceptable credit risk. The business may be experiencing severe financial distress or mismanagement. Additional OceanX capital would be at immediate risk of loss."
+                           ],
+    "next_actions":  [
+                         "REJECT application and communicate decision to applicant",
+                         "Request explanation for ┬ú52,000 director\u0027s loan on 2026-02-14: purpose, terms, repayment schedule, and why it was not disclosed in financials",
+                         "Request explanation for 92% liquidity decline from Mar 31 (┬ú231k) to Apr 30 (┬ú18k): specific events, cash outflows, and management actions",
+                         "Request complete bank statements for Apr 2026 showing all transactions leading to ┬ú18k balance",
+                         "Request updated cash flow forecast showing how business will meet operating expenses over next 3-6 months",
+                         "Request details of ┬ú40,000 existing debt: lender, terms, repayment schedule, and security",
+                         "If customer can satisfactorily explain the liquidity crisis and demonstrate recovery plan, consider re-evaluation in 3-6 months once liquidity stabilizes",
+                         "Flag K. Mensah (director) for enhanced due diligence if customer re-applies"
+                     ],
+    "confidence":  0.95,
+    "requires_human_review":  true
+}

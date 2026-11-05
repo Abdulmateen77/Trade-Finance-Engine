@@ -14,7 +14,13 @@ build/
 # Runtime artifacts
 audit.jsonl
 *.docx
+contracts/
 
 # IDE
 .vscode/
 .idea/
+
+# scratch output
+*.txt
+!requirements.txt
+*_underwriting.json
